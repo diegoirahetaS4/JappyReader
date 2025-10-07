@@ -13,8 +13,11 @@ import AmountInput from '../components/AmountInput';
 import QRScanner from '../components/QRScanner';
 import GiftCardAPI from '../services/api';
 import { MERCHANT_CONFIG, generateReceiptNumber } from '../config/merchant';
+import { useAuth } from '../context/AuthContext';
 
 const RedeemScreen = () => {
+  // Obtener función de logout del contexto de autenticación
+  const { logout, user } = useAuth();
   const [amount, setAmount] = useState(null);
   const [showScanner, setShowScanner] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -114,6 +117,32 @@ const RedeemScreen = () => {
     setShowScanner(false);
   };
 
+  /**
+   * Maneja el cierre de sesión del usuario
+   */
+  const handleLogout = () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro que deseas cerrar sesión?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        {
+          text: 'Cerrar Sesión',
+          onPress: async () => {
+            const result = await logout();
+            if (!result.success) {
+              Alert.alert('Error', 'No se pudo cerrar la sesión');
+            }
+          },
+          style: 'destructive'
+        }
+      ]
+    );
+  };
+
   if (showScanner) {
     return <QRScanner onQRScanned={handleQRScanned} onClose={handleCloseScanner} />;
   }
@@ -139,8 +168,16 @@ const RedeemScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View style={styles.userInfo}>
+            <Text style={styles.welcomeText}>Hola, {user?.displayName || 'Usuario'}</Text>
+          </View>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.title}>Giftcard Reader</Text>
         <Text style={styles.subtitle}>Redención de Giftcards</Text>
       </View>
@@ -159,33 +196,65 @@ const RedeemScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   header: {
     alignItems: 'center',
     paddingTop: 20,
     paddingBottom: 40,
+    backgroundColor: '#fff',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  welcomeText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  logoutButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#ED203C',
+  },
+  logoutButtonText: {
+    color: '#ED203C',
+    fontSize: 14,
+    fontWeight: '700',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ED203C',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
+    fontWeight: '500',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    backgroundColor: '#fff',
   },
   loadingText: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#ED203C',
     marginTop: 20,
     textAlign: 'center',
   },
@@ -194,6 +263,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 10,
     textAlign: 'center',
+    fontWeight: '500',
   },
   footer: {
     paddingHorizontal: 20,

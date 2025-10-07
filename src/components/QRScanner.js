@@ -16,7 +16,7 @@ export default function QRScanner({ onClose, onQRScanned }) {
   const handleBarcodeScanned = ({ data }) => {
     if (data && !qrLock.current) {
       qrLock.current = true;
-      
+
       // Validar que sea un QR válido
       if (!data || data.trim().length === 0) {
         Alert.alert('Error', 'QR inválido detectado');
@@ -27,12 +27,6 @@ export default function QRScanner({ onClose, onQRScanned }) {
       // Llamar al callback con el ID del giftcard
       onQRScanned(data.trim());
     }
-  };
-
-  const handleTestQR = () => {
-    // Simular escaneo de QR para pruebas
-    const testGiftCardId = "TEST_QR_12345";
-    onQRScanned(testGiftCardId);
   };
 
   if (hasPermission === null) {
@@ -81,10 +75,6 @@ export default function QRScanner({ onClose, onQRScanned }) {
           </Text>
         </View>
       </CameraView>
-
-      <TouchableOpacity style={styles.testButton} onPress={handleTestQR}>
-        <Text style={styles.testButtonText}>🔍 Probar con QR de ejemplo</Text>
-      </TouchableOpacity>
 
       <TouchableOpacity style={styles.backButton} onPress={onClose}>
         <Text style={styles.backButtonText}>Volver</Text>
@@ -176,19 +166,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 30,
     paddingHorizontal: 20,
-  },
-  testButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 10,
-    margin: 20,
-    alignItems: 'center',
-  },
-  testButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   backButton: {
     backgroundColor: 'rgba(255,255,255,0.2)',
